@@ -1,19 +1,9 @@
-# functions
-# add book
-# view book
-# search book
-# remove book
-
-# register member
-# view member list
-# search member
-
-# borrow and return book function 
-# view borrowed books
+# add status on members and borrowed books
 
 members = []
 borrowed_books = []
 
+# the books list 
 books = [
     {
     "id": 1,
@@ -35,7 +25,9 @@ books = [
 }
 ]
 
+# add book function
 def add_book():
+    print("")
     print("==== Add Book ====")
     
     book_id = len(books) + 1
@@ -43,7 +35,6 @@ def add_book():
     author = input("Enter book author: ")
     
     new_book = {
-    
         "id": book_id,
         "title": title,
         "author": author,
@@ -225,7 +216,6 @@ def view_borrowed_books():
         member_name = next((member['name'] for member in members if member['id'] == member_id), "Unknown Member")
         book_title = next((book['title'] for book in books if book['id'] == book_id), "Unknown Book")
         
-        print("----------------")
         print(f"Member ID: {member_id}")
         print(f"Member Name: {member_name}")
         print(f"Book ID: {book_id}")
@@ -249,7 +239,7 @@ def main():
         print("11. Exit")
         print("===================================")
         
-        choice = input("Enter your choice: ")
+        choice = input("Enter choice: ")
         
         if choice == '1':
             add_book()
