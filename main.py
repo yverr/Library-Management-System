@@ -1,5 +1,14 @@
 # add status on members and borrowed books
 
+class bcolors:
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 members = []
 borrowed_books = []
 
@@ -25,6 +34,10 @@ books = [
 }
 ]
 
+def exit_program():
+    print("\nPress any key to return to the main menu.")
+    input()
+
 # add book function
 def add_book():
     print("")
@@ -44,6 +57,8 @@ def add_book():
     books.append(new_book)
     print(f"Book '{title}' added successfully!")
     
+    exit_program()
+    
 def view_books():
     print("==== View Books ====")
     
@@ -58,6 +73,8 @@ def view_books():
         print(f"Author: {book['author']}")
         print(f"Status: {'Available' if book['available'] else 'Not Available'}")
     print("====================")
+    
+    exit_program()
     
 def search_book():
     print("==== Search Book ====")
@@ -77,6 +94,8 @@ def search_book():
     if not found:
         print("Book not found.")
     print("======================")
+    
+    exit_program()    
         
 def remove_book():
     print("==== Remove Book ====")
@@ -92,6 +111,7 @@ def remove_book():
     print("Book not found.")
     print("=====================")
 
+    exit_program()
     
 def add_member():
     print("==== Register Member ====")
@@ -109,6 +129,8 @@ def add_member():
     print(f"Member ID: {member_id}")
     print("=========================")
     
+        
+    
 def view_members():
     print("==== View Members ====")
     
@@ -122,6 +144,8 @@ def view_members():
         print(f"Name: {member['name']}")
         
     print("=========================")
+    
+    exit_program()
         
 def search_member():
     print("==== Search Member ====")
@@ -138,8 +162,8 @@ def search_member():
         
     if not found:
         print("Member not found.")
-        
-    print("=========================")
+
+    exit_program()
 
 def borrow_book():
     print("==== Borrow Book ====")
@@ -174,7 +198,8 @@ def borrow_book():
                 return
     
     print("Book not found.")
-    print("=========================")
+    
+    exit_program()
     
 def return_book():
     print("==== Return Book ====")
@@ -200,13 +225,14 @@ def return_book():
                     return
     
     print("No record of this book being borrowed by the member.")
-    print("=========================")
+  
+    exit_program()
     
 def view_borrowed_books():
     print("==== View Borrowed Books ====")
     
     if len(borrowed_books) == 0:
-        print("No books are currently borrowed.")
+        print(bcolors.WARNING + "\nNo books are currently borrowed." + bcolors.ENDC)
         return
     
     for borrowed in borrowed_books:
@@ -221,25 +247,27 @@ def view_borrowed_books():
         print(f"Book ID: {book_id}")
         print(f"Book Title: {book_title}")
         
-    print("=========================")
+    exit_program()
 
 def main():
     while True:
-        print("\n==== Library Management System ====")
-        print("1. Add Book")
-        print("2. View Books")
-        print("3. Search Book")
-        print("4. Remove Book")
-        print("5. Register Member")
-        print("6. View Members")
-        print("7. Search Member")
-        print("8. Borrow Book")
-        print("9. Return Book")
-        print("10. View Borrowed Books")
-        print("11. Exit")
-        print("===================================")
         
-        choice = input("Enter choice: ")
+        print("\n  --------------------------")
+        print(" |"+bcolors.OKGREEN+" Library Management System "+bcolors.ENDC +" |")
+        print(" |  1. Add Book               |")
+        print(" |  2. View Books             |")
+        print(" |  3. Search Book            |")
+        print(" |  4. Remove Book            |")
+        print(" |  5. Register Member        |")
+        print(" |  6. View Members           |")
+        print(" |  7. Search Member          |")
+        print(" |  8. Borrow Book            |")
+        print(" |  9. Return Book            |")
+        print(" |  10. View Borrowed Books   |")
+        print(" |  11. Exit                  |")
+        print("  ---------------------------")
+        
+        choice = input(bcolors.OKGREEN + "Enter choice: " + bcolors.ENDC)
         
         if choice == '1':
             add_book()
@@ -265,6 +293,6 @@ def main():
             print("Exiting the program. Thank you for using the Library Management System, bye-bye!!!")
             break
         else:
-            print("Invalid choice. Please try again.")
-            
+            print(bcolors.FAIL + "\nInvalid choice. Please try again." + bcolors.ENDC)
+
 main()
