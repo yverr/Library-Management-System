@@ -1,4 +1,4 @@
-# !ADDITIONAL FEATURES TO BE ADDED
+# ! ADDITIONAL FEATURES TO BE ADDED
 # add status on members and borrowed books
 # add time limit on borrowed books fine fees
 
@@ -77,7 +77,7 @@ def view_books():
     print("==== View Books ====")
     
     if len(books) == 0:
-        print(fail + "No books available." + end)
+        print(fail + "\nNo books available." + end)
         return
     
     for book in books:
@@ -86,12 +86,12 @@ def view_books():
         print(f"Title: {book['title']}")
         print(f"Author: {book['author']}")
         print(f"Status: {'Available' if book['available'] else 'Not Available'}")
-    print("====================")
+    print("-----------------------------------")
     
     exit_program()
     
 def search_book():
-    print("==== Search Book ====")
+    print(green + "\n----------- Search Book -----------" + end)
     
     search_title = input("Enter book title: ")
     
@@ -107,7 +107,7 @@ def search_book():
         
     if not found:
         print(fail + "Book not found." + end)
-    print("======================")
+    print(green +"-----------------------------------" + end)
     
     exit_program()    
         
@@ -122,8 +122,8 @@ def remove_book():
             print(f"Book '{book['title']}' removed successfully.")
             return
     
-    print(fail + "Book not found." + end)
-    print("=====================")
+    print(fail + "\nBook not found." + end)
+    print("\n-----------------------------------")
 
     exit_program()
     
@@ -158,12 +158,12 @@ def view_members():
         print(f"ID: {member['id']}")
         print(f"Name: {member['name']}")
         
-    print("=========================")
+    print("-----------------------------------")
     
     exit_program()
         
 def search_member():
-    print("==== Search Member ====")
+    print("----------- Search Member -----------")
     
     search_name = input("Enter member name: ")
     
@@ -217,7 +217,7 @@ def borrow_book():
     exit_program()
     
 def return_book():
-    print("==== Return Book ====")
+    print("----------- Return Book -----------")
     
     member_id = int(input("Enter member ID: "))
     
