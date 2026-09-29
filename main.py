@@ -1,8 +1,22 @@
 # ! ADDITIONAL FEATURES TO BE ADDED
 # add status on members and borrowed books
-# add time limit on borrowed books fine fees
+# DONE: time limit on borrowed books + fine fees
+# DONE: RULES
 
+from datetime import date, timedelta
 
+LOAN_DAYS = 7          # how long they can keep the book
+FINE_PER_DAY = 30      # pesos per day late
+
+# for testing: set this to a number of days to skip ahead in time
+DAY_OFFSET = 0
+
+def today():
+    return date.today() + timedelta(days=DAY_OFFSET)
+
+returned_books = []    # history of returned books
+
+# text color in the terminal
 class bcolors:
     OKCYAN = '\033[96m'
     OKGREEN = '\033[92m'
@@ -43,12 +57,16 @@ books = [
 }
 ]
 
+# called in the end of every function to prevent the user from immediately going back to the main menu
 def exit_program():
     print(green + "\nPress any key to return to the main menu." + end)
     input()
 
 def view_rules():
     print(green + "\n----------- RULES -----------" + end)
+    print(f"1. Books can be borrowed for {LOAN_DAYS} days.")
+    print(f"2. Late returns are fined P{FINE_PER_DAY} per day after the due date.")
+    print("3. Returning on the due date is still free.")
 
     exit_program()
 
@@ -86,7 +104,7 @@ def view_books():
         print(f"Title: {book['title']}")
         print(f"Author: {book['author']}")
         print(f"Status: {'Available' if book['available'] else 'Not Available'}")
-    print("-----------------------------------")
+    print("----------------")
     
     exit_program()
     
@@ -112,7 +130,7 @@ def search_book():
     exit_program()    
         
 def remove_book():
-    print("==== Remove Book ====")
+    print("----------- Remove Book -----------")
     
     book_id = int(input("Enter book ID to remove: "))
     
@@ -147,7 +165,7 @@ def add_member():
         
     
 def view_members():
-    print("==== View Members ====")
+    print("----------- View Members -----------")
     
     if len(members) == 0:
         print(fail + "No members registered." + end)
@@ -181,7 +199,7 @@ def search_member():
     exit_program()
 
 def borrow_book():
-    print("==== Borrow Book ====")
+    print("----------- Borrow Book -----------")
     
     if len(members) == 0:
         print(fail + "No members registered. Please register a member first." + end)
@@ -202,11 +220,20 @@ def borrow_book():
         if book['id'] == book_id:
             if book['available']:
                 book['available'] = False
+                
+                borrowed_on = today()
+                due_date = borrowed_on + timedelta(days=LOAN_DAYS)
+                
                 borrowed_books.append({
                     "member_id": member_id,
-                    "book_id": book_id
+                    "book_id": book_id,
+                    "borrowed_on": borrowed_on,
+                    "due_date": due_date
                 })
                 print(f"Book '{book['title']}' borrowed successfully.")
+                print(f"Borrowed on: {borrowed_on}")
+                print(yellow + f"Due date: {due_date}" + end)
+                exit_program()
                 return
             else:
                 print(fail + "\n Book is not available." + end)
@@ -232,11 +259,33 @@ def return_book():
     # Check if the book was borrowed by the member
     for borrowed in borrowed_books:
         if borrowed['member_id'] == member_id and borrowed['book_id'] == book_id:
+            returned_on = today()
+            days_late = max(0, (returned_on - borrowed['due_date']).days)
+            fine = days_late * FINE_PER_DAY
+            
             borrowed_books.remove(borrowed)
+            returned_books.append({
+                "member_id": member_id,
+                "book_id": book_id,
+                "borrowed_on": borrowed['borrowed_on'],
+                "due_date": borrowed['due_date'],
+                "returned_on": returned_on,
+                "days_late": days_late,
+                "fine": fine
+            })
+            
             for book in books:
                 if book['id'] == book_id:
                     book['available'] = True
                     print(f"Book '{book['title']}' returned successfully.")
+                    print(f"Borrowed on: {borrowed['borrowed_on']}")
+                    print(f"Due date: {borrowed['due_date']}")
+                    print(f"Returned on: {returned_on}")
+                    if fine > 0:
+                        print(fail + f"Late by {days_late} day(s). Fine: P{fine}" + end)
+                    else:
+                        print(green + "Returned on time. No fine." + end)
+                    exit_program()
                     return
     
     print(fail + "No record of this book being borrowed by the member." + end)
@@ -248,20 +297,79 @@ def view_borrowed_books():
     
     if len(borrowed_books) == 0:
         print(bcolors.WARNING + "\nNo books are currently borrowed." + bcolors.ENDC)
+        exit_program()
         return
     
     for borrowed in borrowed_books:
         member_id = borrowed['member_id']
         book_id = borrowed['book_id']
         
-        member_name = next((member['name'] for member in members if member['id'] == member_id), "Unknown Member")
-        book_title = next((book['title'] for book in books if book['id'] == book_id), "Unknown Book")
+        # look up the member's name using their ID
+        member_name = "Unknown Member"
+        for member in members:
+            if member['id'] == member_id:
+                member_name = member['name']
+                break
         
+        # look up the book's title using its ID
+        book_title = "Unknown Book"
+        for book in books:
+            if book['id'] == book_id:
+                book_title = book['title']
+                break
+        
+        print("----------------")
         print(f"Member ID: {member_id}")
         print(f"Member Name: {member_name}")
         print(f"Book ID: {book_id}")
         print(f"Book Title: {book_title}")
+        print(f"Borrowed on: {borrowed['borrowed_on']}")
+        print(f"Due date: {borrowed['due_date']}")
         
+        days_late = (today() - borrowed['due_date']).days
+        if days_late > 0:
+            print(fail + f"Status: OVERDUE by {days_late} day(s). Current fine: P{days_late * FINE_PER_DAY}" + end)
+        else:
+            print(green + f"Status: On time ({-days_late} day(s) left)" + end)
+    print("----------------")
+        
+    exit_program()
+
+def view_history():
+    print(green + "\n----------- Return History -----------" + end)
+    
+    if len(returned_books) == 0:
+        print(fail + "No returned books yet." + end)
+        exit_program()
+        return
+    
+    for r in returned_books:
+        # look up the member's name using their ID
+        member_name = "Unknown Member"
+        for member in members:
+            if member['id'] == r['member_id']:
+                member_name = member['name']
+                break
+        
+        # look up the book's title using its ID
+        book_title = "Unknown Book"
+        for book in books:
+            if book['id'] == r['book_id']:
+                book_title = book['title']
+                break
+        
+        print("----------------")
+        print(f"Member: {member_name} (ID: {r['member_id']})")
+        print(f"Book: {book_title} (ID: {r['book_id']})")
+        print(f"Borrowed on: {r['borrowed_on']}")
+        print(f"Due date: {r['due_date']}")
+        print(f"Returned on: {r['returned_on']}")
+        if r['fine'] > 0:
+            print(fail + f"Late by {r['days_late']} day(s). Fine: P{r['fine']}" + end)
+        else:
+            print(green + "On time. No fine." + end)
+    print("----------------")
+    
     exit_program()
 
 def main():
@@ -270,17 +378,18 @@ def main():
         print("\n  --------------------------")
         print(" |"+bcolors.OKGREEN+" Library Management System "+bcolors.ENDC +" |     ⠀⠀⠀⢸⣦⡀⠀⠀⠀⠀⢀⡄⠀⠀⠀⠀⠀⠀")
         print(" |  0. View Rules             |     ⠀⠀⠀⢸⣏⠻⣶⣤⡶⢾⡿⠁⠀⢠⣄⡀⢀⣴⠀")
-        print(" |  1. Add Book               |     ⠀⠀⣀⣼⠷⠀⠀⠁⢀⣿⠃⠀⠀⢀⣿⣿⣿⣇⠀ ˚　　✦　　　.　　. 　 ˚　.　　　　　 . ✦　　　 　˚　　　　 . ★ ⋆ .")
-        print(" |  2. View Books             |     ⠴⣾⣯⣅⣀⠀⠀⠀⠈⢻⣦⡀⠒⠻⠿⣿⡿⠿⠓⠂⠀⠀⢀⡇ 　.   　　˚　　 　*　　 　　✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　 ˚　.　 ⠀")
+        print(" |  1. Add Book               |     ⠀⠀⣀⣼⠷⠀⠀⠁⢀⣿⠃⠀⠀⢀⣿⣿⣿⣇⠀ ˚　　✦　　　.　　. 　 ˚　.　　　　　 . ✦　　　 　˚　　　　 . ★ ⋆ .")
+        print(" |  2. View Books             |     ⠴⣾⣯⣅⣀⠀⠀⠀⠈⢻⣦⡀⠒⠻⠿⣿⡿⠿⠓⠂⠀⠀⢀⡇ 　.   　　˚　　 　*　　 　　✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　 ˚　.　 ⠀")
         print(" |  3. Search Book            |     ⠀⠀⠀⠉⢻⡇⣤⣾⣿⣷⣿⣿⣤⠀⠀⣿⠁⠀⠀⠀⢀⣴⣿⣿⠀")
         print(" |  4. Remove Book            |     ⠀⠀⠀⠀⠸⣿⡿⠏⠀⢀⠀⠀⠿⣶⣤⣤⣤⣄⣀⣴⣿⡿⢻⣿⡆⠀⠀")
-        print(" |  5. Register Member        |     ⠀⠀⠀⠀⠀⠟⠁⠀⢀⣼⠀⠀⠀⠹⣿⣟⠿⠿⠿⡿⠋⠀⠘⣿⣇⠀.   　　˚　　　✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　 ˚　.　" )
+        print(" |  5. Register Member        |     ⠀⠀⠀⠀⠀⠟⠁⠀⢀⣼⠀⠀⠀⠹⣿⣟⠿⠿⠿⡿⠋⠀⠘⣿⣇⠀.   　　˚　　　✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　 ˚　.　" )
         print(" |  6. View Members           |     ⠀⠀⠀⠀⠀⢳⣶⣶⣿⣿⣇⣀⠀⠀⠙⣿⣆⠀⠀⠀⠀⠀⠀⠛⠿⣿⣦⣤⣀⠀⠀　　　 . ✦　　　 　˚　　　　 . ★ ⋆ .")
         print(" |  7. Search Member          |     ⠀⠀⠀⠀⠀⠀⣹⣿⣿⣿⣿⠿⠋⠁⠀⣹⣿⠳⠀⠀⠁⠀⠀⠀⢀⣠⣽⣿⡿⠟⠃")
         print(" |  8. Borrow Book            |     ⠀⠀⠀⠀⠀⢰⠿⠛⠻⢿⡇⠀⠀⠀⣰⣿⠏⠀⠀⢀⠀⠀⠀⣾⣿⠟⠋⠁⠀⠀")
-        print(" |  9. Return Book            |     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠀⠀⣰⣿⣿⣾⣿⠿⢿⣷⣀⢀⣿⡇⠁⠀⠀⠀✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　⠀")
+        print(" |  9. Return Book            |     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠀⠀⣰⣿⣿⣾⣿⠿⢿⣷⣀⢀⣿⡇⠁⠀⠀⠀✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　⠀")
         print(" |  10. View Borrowed Books   |     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠉⠁⠀⠀⠀⠀⠙⢿⣿⣿⠇⠀⠀")
-        print(" |  11. Exit                  |     ⠀⠀⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⠀⠀⠀⠀⠀")
+        print(" |  11. View Return History   |     ⠀⠀⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⠀⠀⠀⠀⠀")
+        print(" |  12. Exit                  |")
         print("  ---------------------------")
         
         choice = input(bcolors.OKGREEN + "Enter choice: " + bcolors.ENDC)
@@ -308,6 +417,8 @@ def main():
         elif choice == '10':
             view_borrowed_books()
         elif choice == '11':
+            view_history()
+        elif choice == '12':
             print("Exiting the program. Thank you for using the Library Management System, bye-bye!!!")
             break
         else:
