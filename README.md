@@ -11,6 +11,5 @@ NEW FEATURES:
 - Return history: new function listing every returned book with the member, book, borrow date, due date, return date, and any fine.
 
 FEATURES TO BE FIXED
-- the ID can be repeated when a book is deleted
 - The int(input(...)) lines (member ID, book ID) have no error handling.
 - (limitation) data is not saved after closing the program 
