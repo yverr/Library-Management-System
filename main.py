@@ -1,33 +1,28 @@
 # Library Management System (terminal version)
-# everything is stored in lists of dictionaries, not in a database or file
-# so all the data resets whenever the program closes...
 
 # ! ADDITIONAL FEATURES TO BE ADDED
 # add status on members and borrowed books
 # DONE: time limit on borrowed books + fine fees
 # DONE: RULES
 
-# date = today's date, timedelta = a chunk of time (like "7 days").
-# we use em together to work out due dates and how late a book is
 from datetime import date, timedelta
 
 # settings for the borrowing rules. The rest of the code reads these two,
 # so if we want to change the rules we only edit them here
-LOAN_DAYS = 7          # how long they can keep the book
-FINE_PER_DAY = 30      # pesos per day late
+LOAN_DAYS = 7     
+FINE_PER_DAY = 30     
 
 # for testing: set this to a number of days to skip ahead in time
 DAY_OFFSET = 0
 
 # gives us today's date plus DAY_OFFSET. We use this instead of date.today()
 # so we can fake time passing. Example: DAY_OFFSET = 10 acts like it's 10 days
-# from now, which lets us test late fines without waiting
 def today():
     return date.today() + timedelta(days=DAY_OFFSET)
 
 returned_books = []    # history of returned books
 
-# text color in the terminal
+
 class bcolors:
     OKCYAN = '\033[96m'
     OKGREEN = '\033[92m'
@@ -38,22 +33,16 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-# shortcuts so we can write green + "text" + end instead of typing
-# bcolors.OKGREEN every time. 'end' resets the color back to normal
 green = bcolors.OKGREEN
 end = bcolors.ENDC
 yellow = bcolors.YELLOW
 fail = bcolors.FAIL
 
-# members = everyone registered
-# borrowed_books = loans that are still going on (the book hasn't been returned yet)
-# none of this is saved to a file, so it all resets when the program closes
+
 members = []
 borrowed_books = []
 
 # the books list 
-# each book is a dictionary: id, title, author, and available
-# available = True means it's on the shelf, False means someone borrowed it
 books = [
     {
     "id": 1,
@@ -78,12 +67,9 @@ books = [
 # called in the end of every function to prevent the user from immediately going back to the main menu
 def exit_program():
     print(green + "\nPress any key to return to the main menu." + end)
-    # input() just waits for the user to press Enter, so the menu
-    # doesn't instantly pop up and cover whatever was printed
     input()
 
-# prints the rules. It uses LOAN_DAYS and FINE_PER_DAY so the rules shown
-# always match what the program actually does
+
 def view_rules():
     print("\n╔═══════════════════════════"+ green +" RULES "+ end +"═════════════════════════════╗" )
     print(f"║   1. Books can be borrowed for 7 days.                        ║")
@@ -118,7 +104,7 @@ def add_book():
     
     exit_program()
     
-# prints every book in the list, with its status
+
 def view_books():
     print("==== View Books ====")
     
@@ -133,7 +119,7 @@ def view_books():
         print(f"ID: {book['id']}")
         print(f"Title: {book['title']}")
         print(f"Author: {book['author']}")
-        # 'available' is True/False, so this turns it into words people can read
+
         print(f"Status: {'Available' if book['available'] else 'Not Available'}")
     print("----------------")
     
@@ -145,8 +131,6 @@ def search_book():
     
     search_title = input("Enter book title: ")
     
-    # starts as False and becomes True if we find a match.
-    # we check it after the loop to know if we should print "not found"
     found = False
     for book in books:
         # .lower() makes both lowercase, so "reverend insanity" still matches "Reverend Insanity"
@@ -169,7 +153,7 @@ def search_book():
 def remove_book():
     print("----------- Remove Book -----------")
     
-    # input() gives text, so int() turns it into a number we can compare with the ids
+
     book_id = int(input("Enter book ID to remove: "))
     
     for book in books:
@@ -226,7 +210,7 @@ def view_members():
     
     exit_program()
         
-# finds a member by name (full name, capital letters don't matter)
+
 def search_member():
     print("----------- Search Member -----------")
     
