@@ -85,10 +85,11 @@ def exit_program():
 # prints the rules. It uses LOAN_DAYS and FINE_PER_DAY so the rules shown
 # always match what the program actually does
 def view_rules():
-    print(green + "\n----------- RULES -----------" + end)
-    print(f"1. Books can be borrowed for {LOAN_DAYS} days.")
-    print(f"2. Late returns are fined P{FINE_PER_DAY} per day after the due date.")
-    print("3. Returning on the due date is still free.")
+    print("\n╔═══════════════════════════"+ green +" RULES "+ end +"═════════════════════════════╗" )
+    print(f"║   1. Books can be borrowed for 7 days.                        ║")
+    print(f"║   2. Late returns are fined P30 per day after the due date.   ║")
+    print("║   3. Returning on the due date is still free.                 ║")
+    print("╚═══════════════════════════════════════════════════════════════╝")
 
     exit_program()
 
@@ -462,24 +463,24 @@ def main():
     # the only way out is the 'break' in the exit option
     while True:
      
-        print("\n  --------------------------")
-        print(" |"+bcolors.OKGREEN+" Library Management System "+bcolors.ENDC +" |     ⠀⠀⠀⢸⣦⡀⠀⠀⠀⠀⢀⡄⠀⠀⠀⠀⠀⠀")
-        print(" |  0. View Rules             |     ⠀⠀⠀⢸⣏⠻⣶⣤⡶⢾⡿⠁⠀⢠⣄⡀⢀⣴⠀")
-        print(" |  1. Add Book               |     ⠀⠀⣀⣼⠷⠀⠀⠁⢀⣿⠃⠀⠀⢀⣿⣿⣿⣇⠀ ˚　　✦　　　.　　. 　 ˚　.　　　　　 . ✦　　　 　˚　　　　 . ★ ⋆ .")
-        print(" |  2. View Books             |     ⠴⣾⣯⣅⣀⠀⠀⠀⠈⢻⣦⡀⠒⠻⠿⣿⡿⠿⠓⠂⠀⠀⢀⡇ 　.   　　˚　　 　*　　 　　✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　 ˚　.　 ⠀")
-        print(" |  3. Search Book            |     ⠀⠀⠀⠉⢻⡇⣤⣾⣿⣷⣿⣿⣤⠀⠀⣿⠁⠀⠀⠀⢀⣴⣿⣿⠀")
-        print(" |  4. Remove Book            |     ⠀⠀⠀⠀⠸⣿⡿⠏⠀⢀⠀⠀⠿⣶⣤⣤⣤⣄⣀⣴⣿⡿⢻⣿⡆⠀⠀")
-        print(" |  5. Register Member        |     ⠀⠀⠀⠀⠀⠟⠁⠀⢀⣼⠀⠀⠀⠹⣿⣟⠿⠿⠿⡿⠋⠀⠘⣿⣇⠀.   　　˚　　　✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　 ˚　.　" )
-        print(" |  6. View Members           |     ⠀⠀⠀⠀⠀⢳⣶⣶⣿⣿⣇⣀⠀⠀⠙⣿⣆⠀⠀⠀⠀⠀⠀⠛⠿⣿⣦⣤⣀⠀⠀　　　 . ✦　　　 　˚　　　　 . ★ ⋆ .")
-        print(" |  7. Search Member          |     ⠀⠀⠀⠀⠀⠀⣹⣿⣿⣿⣿⠿⠋⠁⠀⣹⣿⠳⠀⠀⠁⠀⠀⠀⢀⣠⣽⣿⡿⠟⠃")
-        print(" |  8. Borrow Book            |     ⠀⠀⠀⠀⠀⢰⠿⠛⠻⢿⡇⠀⠀⠀⣰⣿⠏⠀⠀⢀⠀⠀⠀⣾⣿⠟⠋⠁⠀⠀")
-        print(" |  9. Return Book            |     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠀⠀⣰⣿⣿⣾⣿⠿⢿⣷⣀⢀⣿⡇⠁⠀⠀⠀✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　⠀")
-        print(" |  10. View Borrowed Books   |     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠉⠁⠀⠀⠀⠀⠙⢿⣿⣿⠇⠀⠀")
-        print(" |  11. View Return History   |     ⠀⠀⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⠀⠀⠀⠀⠀")
-        print(" |  12. Exit                  |")
-        print("  ---------------------------")
+        print("\n ╔════════════════════════════════╗")
+        print(" ║"+bcolors.OKGREEN+"  Library Management System "+bcolors.ENDC +"    ║     ⠀⠀⠀⢸⣦⡀⠀⠀⠀⠀⢀⡄⠀⠀⠀⠀⠀⠀")
+        print(" ║  [0] View Rules                ║     ⠀⠀⠀⢸⣏⠻⣶⣤⡶⢾⡿⠁⠀⢠⣄⡀⢀⣴⠀")
+        print(" ║  [1] Add Book                  ║     ⠀⠀⣀⣼⠷⠀⠀⠁⢀⣿⠃⠀⠀⢀⣿⣿⣿⣇⠀ ˚　　✦　　　.　　. 　 ˚　.　　　　　 . ✦　　　 　˚　　　　 . ★ ⋆ .")
+        print(" ║  [2] View Books                ║     ⠴⣾⣯⣅⣀⠀⠀⠀⠈⢻⣦⡀⠒⠻⠿⣿⡿⠿⠓⠂⠀⠀⢀⡇ 　.   　　˚　　 　*　　 　　✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　 ˚　.　 ⠀")
+        print(" ║  [3] Search Book               ║     ⠀⠀⠀⠉⢻⡇⣤⣾⣿⣷⣿⣿⣤⠀⠀⣿⠁⠀⠀⠀⢀⣴⣿⣿⠀")
+        print(" ║  [4] Remove Book               ║     ⠀⠀⠀⠀⠸⣿⡿⠏⠀⢀⠀⠀⠿⣶⣤⣤⣤⣄⣀⣴⣿⡿⢻⣿⡆⠀⠀")
+        print(" ║  [5] Register Member           ║     ⠀⠀⠀⠀⠀⠟⠁⠀⢀⣼⠀⠀⠀⠹⣿⣟⠿⠿⠿⡿⠋⠀⠘⣿⣇⠀.   　　˚　　　✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　 ˚　.　" )
+        print(" ║  [6] View Members              ║     ⠀⠀⠀⠀⠀⢳⣶⣶⣿⣿⣇⣀⠀⠀⠙⣿⣆⠀⠀⠀⠀⠀⠀⠛⠿⣿⣦⣤⣀⠀⠀　　　 . ✦　　　 　˚　　　　 . ★ ⋆ .")
+        print(" ║  [7] Search Member             ║     ⠀⠀⠀⠀⠀⠀⣹⣿⣿⣿⣿⠿⠋⠁⠀⣹⣿⠳⠀⠀⠁⠀⠀⠀⢀⣠⣽⣿⡿⠟⠃")
+        print(" ║  [8] Borrow Book               ║     ⠀⠀⠀⠀⠀⢰⠿⠛⠻⢿⡇⠀⠀⠀⣰⣿⠏⠀⠀⢀⠀⠀⠀⣾⣿⠟⠋⠁⠀⠀")
+        print(" ║  [9] Return Book               ║     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠀⠀⣰⣿⣿⣾⣿⠿⢿⣷⣀⢀⣿⡇⠁⠀⠀⠀✦　.　　.　　　✦　˚ 　 ˚　.˚　　　.　　. 　⠀")
+        print(" ║  [10] View Borrowed Books      ║     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠉⠁⠀⠀⠀⠀⠙⢿⣿⣿⠇⠀⠀")
+        print(" ║  [11] View Return History      ║     ⠀⠀⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⠀⠀⠀⠀⠀")
+        print(" ║  [12] Exit                     ║")
+        print(" ╚════════════════════════════════╝")
         
-        choice = input(bcolors.OKGREEN + "Enter choice: " + bcolors.ENDC)
+        choice = input(bcolors.OKGREEN + " ➤  Enter choice: " + bcolors.ENDC)
         
         # each choice calls the function that handles that feature
         if choice == '0':
