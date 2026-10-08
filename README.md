@@ -13,3 +13,7 @@ NEW FEATURES:
 FEATURES TO BE FIXED
 - The int(input(...)) lines (member ID, book ID) have no error handling.
 - (limitation) data is not saved after closing the program 
+
+LIMITATIONS
+- Terminal only, no GUI
+- Use is limited only to library staff, dtudents, staff, or library members should not access this system
