@@ -16,4 +16,4 @@ FEATURES TO BE FIXED
 
 LIMITATIONS
 - Terminal only, no GUI
-- Use is limited only to library staff, dtudents, staff, or library members should not access this system
+- Use is limited only to library staff or administrators. members should not have access this system
