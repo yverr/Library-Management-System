@@ -38,6 +38,12 @@ end = bcolors.ENDC
 yellow = bcolors.YELLOW
 fail = bcolors.FAIL
 
+line = "═" * 65
+dash = "─" * 65
+
+# IDs look like BK-001 for books and MB-001 for members (a prefix + a 3 digit number)
+# (10 books to start, 0 members)
+counters = {"book": 10, "member": 0}
 
 members = []
 borrowed_books = []
@@ -45,21 +51,63 @@ borrowed_books = []
 # the books list 
 books = [
     {
-    "id": 1,
+    "id": "BK-001",
     "title": "Lord of Mysteries",
     "author": "Cuttlefish That Loves Diving",
     "available": True
 },
 {
-    "id": 2,
+    "id": "BK-002",
     "title": "Omniscient Reader's Viewpoint",
     "author": "Sing Shong",
     "available": True
 },
 {
-    "id": 3,
+    "id": "BK-003",
     "title": "Reverend Insanity",
     "author": "Gu Zhen Ren",
+    "available": True
+},
+{
+    "id": "BK-004",
+    "title": "Noli Me Tangere",
+    "author": "Jose Rizal",
+    "available": True
+},
+{
+    "id": "BK-005",
+    "title": "El Filibusterismo",
+    "author": "Jose Rizal",
+    "available": True
+},
+{
+    "id": "BK-006",
+    "title": "Florante at Laura",
+    "author": "Francisco Balagtas",
+    "available": True
+},
+{
+    "id": "BK-007",
+    "title": "Solo Leveling",
+    "author": "Chugong",
+    "available": True
+},
+{
+    "id": "BK-008",
+    "title": "The Beginning After the End",
+    "author": "TurtleMe",
+    "available": True
+},
+{
+    "id": "BK-009",
+    "title": "No Longer Human",
+    "author": "Osamu Dazai",
+    "available": True
+},
+{
+    "id": "BK-010",
+    "title": "Harry Potter and the Sorcerer's Stone",
+    "author": "J.K. Rowling",
     "available": True
 }
 ]
@@ -68,6 +116,7 @@ books = [
 def exit_program():
     print(green + "\nPress any key to return to the main menu." + end)
     input()
+
 
 
 def view_rules():
@@ -79,16 +128,19 @@ def view_rules():
 
     exit_program()
 
+
 # add book function
 def add_book():
-    print("")
-    print(green + "----------- ADD BOOK -----------" + end)
+    print("\n" + line)
+    print(green + "  ADD BOOK" + end)
+    print(line)
     
-    # new id = number of books + 1 (3 books now, so the new one gets id 4)
-    book_id = len(books) + 1
+    # next number in line, turned into an ID like BK-011 (:03d fills it with zeros up to 3 digits)
+    counters["book"] = counters["book"] + 1
+    book_id = f"BK-{counters['book']:03d}"
     # ask the user for the new book's details
-    title = input("Enter book title: ")
-    author = input("Enter book author: ")
+    title = input(green + "Enter book title: " + end)
+    author = input(green + "Enter book author: " + end)
     
     # build the book as a dictionary. available starts as True since nobody has borrowed it yet
     new_book = {
@@ -101,41 +153,72 @@ def add_book():
     # append = add it to the end of the books list
     books.append(new_book)
     print(yellow + f"\nBook '{title}' added successfully!" + end)
+    print(line)
     
     exit_program()
     
 
+# bubble sort: compares two neighbors and swaps them if they are in the wrong order.
+# after the first pass the title that comes last in the alphabet is already at the end,
+# after the second pass the next one is in place, and so on until the whole list is sorted
+def bubble_sort_books(book_list):
+    n = len(book_list)
+    # each pass puts one more book in its final spot
+    for i in range(n - 1):
+        # compare each pair of neighbors (the end of the list is already sorted, so we skip it)
+        for j in range(n - 1 - i):
+            # .lower() so capital letters don't affect the order
+            if book_list[j]['title'].lower() > book_list[j + 1]['title'].lower():
+                # wrong order, so swap them (temp holds one book while we switch)
+                temp = book_list[j]
+                book_list[j] = book_list[j + 1]
+                book_list[j + 1] = temp
+
 def view_books():
-    print("==== View Books ====")
+    print("\n" + line)
+    print(green + "  VIEW BOOKS" + end)
+    print(line)
     
     # if the list is empty there's nothing to show, so we stop early
     if len(books) == 0:
-        print(fail + "\nNo books available." + end)
+        print(fail + "No books available." + end)
+        print(line)
+        exit_program()
         return
     
+    # ask if the user wants the books sorted by title
+    sort_choice = input(green + "Sort by title A-Z? (y/n): " + end).lower()
+    print(dash)
+    
+    # copy the list so sorting doesn't change the real order of the books
+    shown_books = books.copy()
+    if sort_choice == "y":
+        bubble_sort_books(shown_books)
+    
     # go through the books one by one and print each one's details
-    for book in books:
-        print("----------------")
+    for book in shown_books:
         print(f"ID: {book['id']}")
         print(f"Title: {book['title']}")
         print(f"Author: {book['author']}")
-
         print(f"Status: {'Available' if book['available'] else 'Not Available'}")
-    print("----------------")
+        if book != shown_books[-1]:
+            print(dash)
+    print(line)
     
     exit_program()
     
 # looks for a book by title. Needs the full title, but capital letters don't matter
 def search_book():
-    print(green + "\n----------- Search Book -----------" + end)
+    print("\n" + line)
+    print(green + "  SEARCH BOOK" + end)
+    print(line)
     
-    search_title = input("Enter book title: ")
+    search_title = input(green + "Enter book title: " + end)
     
     found = False
     for book in books:
         # .lower() makes both lowercase, so "reverend insanity" still matches "Reverend Insanity"
         if book['title'].lower() == search_title.lower():
-            print("----------------")
             print(f"ID: {book['id']}")
             print(f"Title: {book['title']}")
             print(f"Author: {book['author']}")
@@ -145,16 +228,18 @@ def search_book():
     # nothing matched, so tell the user
     if not found:
         print(fail + "Book not found." + end)
-    print(green +"-----------------------------------" + end)
+    print(line)
     
     exit_program()    
         
 # deletes a book using its ID
 def remove_book():
-    print("----------- Remove Book -----------")
+    print("\n" + line)
+    print(green + "  REMOVE BOOK" + end)
+    print(line)
     
 
-    book_id = int(input("Enter book ID to remove: "))
+    book_id = input(green + "Enter book ID to remove: " + end).upper()
     
     for book in books:
         # found the book the user wants to remove
@@ -162,21 +247,26 @@ def remove_book():
             # take it out of the books list
             books.remove(book)
             print(f"Book '{book['title']}' removed successfully.")
+            print(line)
+            exit_program()
             return
     
     # if we get here, the loop finished and no book had that id
-    print(fail + "\nBook not found." + end)
-    print("\n-----------------------------------")
+    print(fail + "Book not found." + end)
+    print(line)
 
     exit_program()
     
 # registers a new member
 def add_member():
-    print("==== Register Member ====")
+    print("\n" + line)
+    print(green + "  REGISTER MEMBER" + end)
+    print(line)
     
-    # same idea as the book id: number of members + 1
-    member_id = len(members) + 1
-    name = input("Enter member name: ")
+    # same idea as the book id, but the prefix is MB
+    counters["member"] = counters["member"] + 1
+    member_id = f"MB-{counters['member']:03d}"
+    name = input(green + "Enter member name: " + end)
     
     # for now a member only has an id and a name
     new_member = {
@@ -187,6 +277,7 @@ def add_member():
     members.append(new_member)
     print(f"Member '{name}' registered successfully.")
     print(f"Member ID: {member_id}")
+    print(line)
 
     exit_program()
     
@@ -194,39 +285,46 @@ def add_member():
     
 # prints every registered member
 def view_members():
-    print("----------- View Members -----------")
+    print("\n" + line)
+    print(green + "  VIEW MEMBERS" + end)
+    print(line)
     
     # nobody registered yet, so there's non to show
     if len(members) == 0:
         print(fail + "No members registered." + end)
+        print(line)
+        exit_program()
         return
     
     for member in members:
-        print("----------------")
         print(f"ID: {member['id']}")
         print(f"Name: {member['name']}")
+        if member != members[-1]:
+            print(dash)
         
-    print("-----------------------------------")
+    print(line)
     
     exit_program()
         
 
 def search_member():
-    print("----------- Search Member -----------")
+    print("\n" + line)
+    print(green + "  SEARCH MEMBER" + end)
+    print(line)
     
-    search_name = input("Enter member name: ")
+    search_name = input(green + "Enter member name: " + end)
     
     found = False
     for member in members:
         # lowercase both sides so the capitalization doesn't affect the match
         if member['name'].lower() == search_name.lower():
-            print("----------------")
             print(f"ID: {member['id']}")
             print(f"Name: {member['name']}")
             found = True
         
     if not found:
         print(fail + "Member not found." + end)
+    print(line)
 
     exit_program()
 
@@ -235,15 +333,19 @@ def search_member():
 # does the book exist, and is it available ?
 # if everything passes, the book becomes unavailable and we save a loan record with a due date
 def borrow_book():
-    print("----------- Borrow Book -----------")
+    print("\n" + line)
+    print(green + "  BORROW BOOK" + end)
+    print(line)
     
     # can't borrow anything if nobody is registered yet
     if len(members) == 0:
         print(fail + "No members registered. Please register a member first." + end)
+        print(line)
+        exit_program()
         return
     
     # ask who is borrowing
-    member_id = int(input("Enter member ID: "))
+    member_id = input(green + "Enter member ID: " + end).upper()
     
     # Check if member exists
     # any() gives True if at least one member has this id.
@@ -251,9 +353,11 @@ def borrow_book():
     member_exists = any(member['id'] == member_id for member in members)
     if not member_exists:
         print(fail + "Member not found." + end)
+        print(line)
+        exit_program()
         return
     
-    book_id = int(input("Enter book ID to borrow: "))
+    book_id = input(green + "Enter book ID to borrow: " + end).upper()
     
     # Check if book exists and is available
     for book in books:
@@ -275,35 +379,43 @@ def borrow_book():
                     "borrowed_on": borrowed_on,
                     "due_date": due_date
                 })
-                print(f"Book '{book['title']}' borrowed successfully.")
+                print(f"\nBook '{book['title']}' borrowed successfully.")
                 print(f"Borrowed on: {borrowed_on}")
                 print(yellow + f"Due date: {due_date}" + end)
+                print(line)
                 exit_program()
                 return
             else:
-                print(fail + "\n Book is not available." + end)
+                print(fail + "\nBook is not available." + end)
+                print(line)
+                exit_program()
                 return
     
     # the loop ended without finding a book with that id
     print(fail + "Book not found." + end)
+    print(line)
     
     exit_program()
     
 # returns a book. Finds the loan, checks if it's late, calculates the fine,
 # moves the loan to the history list, and puts the book back on the shelf
 def return_book():
-    print("----------- Return Book -----------")
+    print("\n" + line)
+    print(green + "  RETURN BOOK" + end)
+    print(line)
     
-    member_id = int(input("Enter member ID: "))
+    member_id = input(green + "Enter member ID: " + end).upper()
     
     # Check if member exists
     # same member check as in borrow_book
     member_exists = any(member['id'] == member_id for member in members)
     if not member_exists:
         print(fail + "Member not found." + end)
+        print(line)
+        exit_program()
         return
     
-    book_id = int(input("Enter book ID to return: "))
+    book_id = input(green + "Enter book ID to return: " + end).upper()
     
     # Check if the book was borrowed by the member
     # look through the current loans for one that matches BOTH the member and the book..
@@ -333,7 +445,7 @@ def return_book():
                 if book['id'] == book_id:
                     # put the book back on the shelf so it can be borrowed again
                     book['available'] = True
-                    print(f"Book '{book['title']}' returned successfully.")
+                    print(f"\nBook '{book['title']}' returned successfully.")
                     print(f"Borrowed on: {borrowed['borrowed_on']}")
                     print(f"Due date: {borrowed['due_date']}")
                     print(f"Returned on: {returned_on}")
@@ -342,21 +454,26 @@ def return_book():
                         print(fail + f"Late by {days_late} day(s). Fine: P{fine}" + end)
                     else:
                         print(green + "Returned on time. No fine." + end)
+                    print(line)
                     exit_program()
                     return
     
     # we only get here if no loan matched (wrong member or wrong book)
     print(fail + "No record of this book being borrowed by the member." + end)
+    print(line)
   
     exit_program()
     
 # shows every book that's currently borrowed: who has it, due date, and if it's overdue
 def view_borrowed_books():
-    print("==== View Borrowed Books ====")
+    print("\n" + line)
+    print(green + "  VIEW BORROWED BOOKS" + end)
+    print(line)
     
     # no loans rn, so just say so and go back to the menu..
     if len(borrowed_books) == 0:
-        print(bcolors.WARNING + "\nNo books are currently borrowed." + bcolors.ENDC)
+        print(bcolors.WARNING + "No books are currently borrowed." + bcolors.ENDC)
+        print(line)
         exit_program()
         return
     
@@ -380,7 +497,6 @@ def view_borrowed_books():
                 book_title = book['title']
                 break
         
-        print("----------------")
         print(f"Member ID: {member_id}")
         print(f"Member Name: {member_name}")
         print(f"Book ID: {book_id}")
@@ -396,17 +512,22 @@ def view_borrowed_books():
             print(fail + f"Status: OVERDUE by {days_late} day(s). Current fine: P{days_late * FINE_PER_DAY}" + end)
         else:
             print(green + f"Status: On time ({-days_late} day(s) left)" + end)
-    print("----------------")
+        if borrowed != borrowed_books[-1]:
+            print(dash)
+    print(line)
         
     exit_program()
 
 # shows every book that was already returned, including any fines
 def view_history():
-    print(green + "\n----------- Return History -----------" + end)
+    print("\n" + line)
+    print(green + "  RETURN HISTORY" + end)
+    print(line)
     
     # nothings been returned yet
     if len(returned_books) == 0:
         print(fail + "No returned books yet." + end)
+        print(line)
         exit_program()
         return
     
@@ -427,7 +548,6 @@ def view_history():
                 book_title = book['title']
                 break
         
-        print("----------------")
         print(f"Member: {member_name} (ID: {r['member_id']})")
         print(f"Book: {book_title} (ID: {r['book_id']})")
         print(f"Borrowed on: {r['borrowed_on']}")
@@ -437,7 +557,9 @@ def view_history():
             print(fail + f"Late by {r['days_late']} day(s). Fine: P{r['fine']}" + end)
         else:
             print(green + "On time. No fine." + end)
-    print("----------------")
+        if r != returned_books[-1]:
+            print(dash)
+    print(line)
     
     exit_program()
 
