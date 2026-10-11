@@ -1,4 +1,4 @@
-# Library Management System (terminal version)
+# Library Management System (terminal)
 
 # ! ADDITIONAL FEATURES TO BE ADDED
 # add status on members and borrowed books
@@ -7,16 +7,17 @@
 
 from datetime import date, timedelta
 
-# settings for the borrowing rules. The rest of the code reads these two,
+# settings for the borrowing rules. The rest of the code reads these three,
 # so if we want to change the rules we only edit them here
 LOAN_DAYS = 7     
 FINE_PER_DAY = 30     
+# the most a single book can be fined, so the fine doesn't pile up forever (P300 = 10 days late)
+MAX_FINE = 300
 
-# for testing: set this to a number of days to skip ahead in time
+# for testing to skip ahead in time
 DAY_OFFSET = 0
 
-# gives us today's date plus DAY_OFFSET. We use this instead of date.today()
-# so we can fake time passing. Example: DAY_OFFSET = 10 acts like it's 10 days
+# fakes time passing, gives us today's date plus DAY_OFFSET.
 def today():
     return date.today() + timedelta(days=DAY_OFFSET)
 
@@ -124,6 +125,7 @@ def view_rules():
     print(f"║   1. Books can be borrowed for 7 days.                        ║")
     print(f"║   2. Late returns are fined P30 per day after the due date.   ║")
     print("║   3. Returning on the due date is still free.                 ║")
+    print("║   4. The fine for one book is capped at P300.                 ║")
     print("╚═══════════════════════════════════════════════════════════════╝")
 
     exit_program()
@@ -135,12 +137,20 @@ def add_book():
     print(green + "  ADD BOOK" + end)
     print(line)
     
+    # ask the user for the new book's details (.strip() removes extra spaces at the start and end)
+    title = input("Enter book title: ").strip()
+    author = input("Enter book author: ").strip()
+    
+    # don't allow an empty title or author
+    if title == "" or author == "":
+        print(fail + "\nTitle and author cannot be empty." + end)
+        print(line)
+        exit_program()
+        return
+    
     # next number in line, turned into an ID like BK-011 (:03d fills it with zeros up to 3 digits)
     counters["book"] = counters["book"] + 1
     book_id = f"BK-{counters['book']:03d}"
-    # ask the user for the new book's details
-    title = input("Enter book title: ")
-    author = input("Enter book author: ")
     
     # build the book as a dictionary. available starts as True since nobody has borrowed it yet
     new_book = {
@@ -219,6 +229,13 @@ def remove_book():
     for book in books:
         # found the book the user wants to remove
         if book['id'] == book_id:
+            # a borrowed book can't be removed until it is returned
+            if not book['available']:
+                print(fail + "Book is currently borrowed and cannot be removed." + end)
+                print(line)
+                exit_program()
+                return
+            
             # take it out of the books list
             books.remove(book)
             print(f"Book '{book['title']}' removed successfully.")
@@ -238,10 +255,18 @@ def add_member():
     print(green + "  REGISTER MEMBER" + end)
     print(line)
     
+    name = input(green + "Enter member name: " + end).strip()
+    
+    # don't allow an empty name
+    if name == "":
+        print(fail + "\nName cannot be empty." + end)
+        print(line)
+        exit_program()
+        return
+    
     # same idea as the book id, but the prefix is MB
     counters["member"] = counters["member"] + 1
     member_id = f"MB-{counters['member']:03d}"
-    name = input(green + "Enter member name: " + end)
     
     # for now a member only has an id and a name
     new_member = {
@@ -400,8 +425,9 @@ def return_book():
             # max(0, ...) keeps it from going negative when the book is returned early
             returned_on = today()
             days_late = max(0, (returned_on - borrowed['due_date']).days)
-            # total fine = number of days late x pesos per day
-            fine = days_late * FINE_PER_DAY
+            # total fine = number of days late x pesos per day,
+            # min() keeps it from going over MAX_FINE
+            fine = min(days_late * FINE_PER_DAY, MAX_FINE)
             
             # the loan is done, so remove it from the list of current loans
             borrowed_books.remove(borrowed)
@@ -484,7 +510,7 @@ def view_borrowed_books():
         days_late = (today() - borrowed['due_date']).days
         # overdue: show the fine so far (red). Otherwise show how many days are left (green)
         if days_late > 0:
-            print(fail + f"Status: OVERDUE by {days_late} day(s). Current fine: P{days_late * FINE_PER_DAY}" + end)
+            print(fail + f"Status: OVERDUE by {days_late} day(s). Current fine: P{min(days_late * FINE_PER_DAY, MAX_FINE)}" + end)
         else:
             print(green + f"Status: On time ({-days_late} day(s) left)" + end)
         if borrowed != borrowed_books[-1]:
