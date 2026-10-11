@@ -139,8 +139,8 @@ def add_book():
     counters["book"] = counters["book"] + 1
     book_id = f"BK-{counters['book']:03d}"
     # ask the user for the new book's details
-    title = input(green + "Enter book title: " + end)
-    author = input(green + "Enter book author: " + end)
+    title = input("Enter book title: ")
+    author = input("Enter book author: ")
     
     # build the book as a dictionary. available starts as True since nobody has borrowed it yet
     new_book = {
@@ -158,22 +158,6 @@ def add_book():
     exit_program()
     
 
-# bubble sort: compares two neighbors and swaps them if they are in the wrong order.
-# after the first pass the title that comes last in the alphabet is already at the end,
-# after the second pass the next one is in place, and so on until the whole list is sorted
-def bubble_sort_books(book_list):
-    n = len(book_list)
-    # each pass puts one more book in its final spot
-    for i in range(n - 1):
-        # compare each pair of neighbors (the end of the list is already sorted, so we skip it)
-        for j in range(n - 1 - i):
-            # .lower() so capital letters don't affect the order
-            if book_list[j]['title'].lower() > book_list[j + 1]['title'].lower():
-                # wrong order, so swap them (temp holds one book while we switch)
-                temp = book_list[j]
-                book_list[j] = book_list[j + 1]
-                book_list[j + 1] = temp
-
 def view_books():
     print("\n" + line)
     print(green + "  VIEW BOOKS" + end)
@@ -186,22 +170,13 @@ def view_books():
         exit_program()
         return
     
-    # ask if the user wants the books sorted by title
-    sort_choice = input(green + "Sort by title A-Z? (y/n): " + end).lower()
-    print(dash)
-    
-    # copy the list so sorting doesn't change the real order of the books
-    shown_books = books.copy()
-    if sort_choice == "y":
-        bubble_sort_books(shown_books)
-    
     # go through the books one by one and print each one's details
-    for book in shown_books:
+    for book in books:
         print(f"ID: {book['id']}")
         print(f"Title: {book['title']}")
         print(f"Author: {book['author']}")
         print(f"Status: {'Available' if book['available'] else 'Not Available'}")
-        if book != shown_books[-1]:
+        if book != books[-1]:
             print(dash)
     print(line)
     
