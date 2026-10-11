@@ -39,8 +39,8 @@ end = bcolors.ENDC
 yellow = bcolors.YELLOW
 fail = bcolors.FAIL
 
-line = "═" * 65
-dash = "─" * 65
+line = "═════════════════════════════════════════════════════════════════" 
+dash = "─────────────────────────────────────────────────────────────────"
 
 # IDs look like BK-001 for books and MB-001 for members (a prefix + a 3 digit number)
 # (10 books to start, 0 members)
