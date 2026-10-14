@@ -1,4 +1,4 @@
-# Library Management System (terminal)
+# Library Management System (terminal version)
 
 # ! ADDITIONAL FEATURES TO BE ADDED
 # add status on members and borrowed books
@@ -14,10 +14,11 @@ FINE_PER_DAY = 30
 # the most a single book can be fined, so the fine doesn't pile up forever (P300 = 10 days late)
 MAX_FINE = 300
 
-# for testing to skip ahead in time
+# for testing: set this to a number of days to skip ahead in time
 DAY_OFFSET = 0
 
-# fakes time passing, gives us today's date plus DAY_OFFSET.
+# gives us today's date plus DAY_OFFSET. We use this instead of date.today()
+# so we can fake time passing. Example: DAY_OFFSET = 10 acts like it's 10 days
 def today():
     return date.today() + timedelta(days=DAY_OFFSET)
 
@@ -25,21 +26,18 @@ returned_books = []    # history of returned books
 
 
 class bcolors:
-    OKCYAN = '\033[96m'
     OKGREEN = '\033[92m'
     WARNING = '\033[93m'
     YELLOW = '\033[33m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 green = bcolors.OKGREEN
 end = bcolors.ENDC
 yellow = bcolors.YELLOW
 fail = bcolors.FAIL
 
-line = "═════════════════════════════════════════════════════════════════" 
+line = "═════════════════════════════════════════════════════════════════"
 dash = "─────────────────────────────────────────────────────────────────"
 
 # IDs look like BK-001 for books and MB-001 for members (a prefix + a 3 digit number)
@@ -168,30 +166,65 @@ def add_book():
     exit_program()
     
 
+# bubble sort: compares two neighbors and swaps them if they are in the wrong order.
+def bubble_sort_books(book_list):
+    n = len(book_list)
+    for i in range(n - 1):
+        for j in range(n - 1 - i):
+            if book_list[j]['title'].lower() > book_list[j + 1]['title'].lower():
+                temp = book_list[j]
+                book_list[j] = book_list[j + 1]
+                book_list[j + 1] = temp
+
 def view_books():
     print("\n" + line)
     print(green + "  VIEW BOOKS" + end)
     print(line)
-    
+
     # if the list is empty there's nothing to show, so we stop early
     if len(books) == 0:
         print(fail + "No books available." + end)
         print(line)
         exit_program()
         return
-    
-    # go through the books one by one and print each one's details
-    for book in books:
+
+    # ask if the user wants the books sorted alphabetically
+    while True:
+        sort_choice = input(
+            green + "Sort books alphabetically? (y/n): " + end
+        ).lower().strip()
+
+        # accept only y or n
+        if sort_choice == "y" or sort_choice == "n":
+            break
+
+        print(fail + "Invalid choice. Please enter y or n." + end)
+
+    print(dash)
+
+    # copy the list so sorting doesn't change the real order of the books
+    shown_books = books.copy()
+
+    if sort_choice == "y":
+        bubble_sort_books(shown_books)
+        print(green + "Books sorted alphabetically (A-Z)." + end)
+        print(dash)
+    else:
+        print("Showing books in their original order.")
+        print(dash)
+
+    for book in shown_books:
         print(f"ID: {book['id']}")
         print(f"Title: {book['title']}")
         print(f"Author: {book['author']}")
         print(f"Status: {'Available' if book['available'] else 'Not Available'}")
-        if book != books[-1]:
+
+        if book != shown_books[-1]:
             print(dash)
+
     print(line)
-    
     exit_program()
-    
+
 # looks for a book by title. Needs the full title, but capital letters don't matter
 def search_book():
     print("\n" + line)
@@ -202,7 +235,6 @@ def search_book():
     
     found = False
     for book in books:
-        # .lower() makes both lowercase, so "reverend insanity" still matches "Reverend Insanity"
         if book['title'].lower() == search_title.lower():
             print(f"ID: {book['id']}")
             print(f"Title: {book['title']}")
@@ -264,7 +296,6 @@ def add_member():
         exit_program()
         return
     
-    # same idea as the book id, but the prefix is MB
     counters["member"] = counters["member"] + 1
     member_id = f"MB-{counters['member']:03d}"
     
